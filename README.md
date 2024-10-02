@@ -1,6 +1,6 @@
 # Syntax Sage
 
-![Banner](images/banner.jpg)
+![Banner](src/images/banner.jpg)
 
 ## Overview
 
