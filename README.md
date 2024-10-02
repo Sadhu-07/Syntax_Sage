@@ -1,5 +1,7 @@
 # Syntax Sage
 
+![Banner](images/banner.jpg)
+
 ## Overview
 
 The **Synatx Sage** is a web-based application designed to assist users in generating code snippets and solutions for various programming tasks, particularly for competitive programming. By harnessing the power of **Large Language Models (LLMs)**, this project offers a seamless user experience in obtaining code outputs based on user-defined prompts. The application is built using **React.js** for the frontend interface and **Flask** for the backend processing, ensuring a robust and responsive platform.
