@@ -28,4 +28,4 @@ ninja==1.11.1
 # trying to offload weights to disk
 safetensors==0.3.1
 
-#token=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
+#token=Your Token
