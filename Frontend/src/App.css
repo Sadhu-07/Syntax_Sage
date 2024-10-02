@@ -1,38 +1,271 @@
-.App {
-  text-align: center;
+/* Base styles */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  background: url('./images/wallpaper.jpg') no-repeat center center fixed;
+  background-size: cover;
+  padding: 20px;
+  color: black;
+}
+
+/* Main container styles */
+.code-gen-container {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 30px;
+  width: 90%;
+  max-width: 1200px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* Title styles */
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Form styles */
+.code-gen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Input field styles */
+.input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px;
+  color: black;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.large-input {
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* Dropdown styles */
+select.input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  padding-right: 30px;
+}
+
+/* Submit button styles */
+.submit-btn {
+  background-color: #4CAF50;
   color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
 }
 
-.App-link {
-  color: #61dafb;
+.submit-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Output container styles */
+.output-container {
+  margin-top: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  padding: 15px;
+  width: 100%;
+}
+
+/* Code output styles */
+.output {
+  background-color: #f8f8f8;
+  color: #333;
+  font-family: 'Fira Code', monospace;
+  border-radius: 5px;
+  padding: 15px;
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  border: 1px solid #ddd;
+}
+
+/* Error message */
+.error-message {
+  color: #d32f2f;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Generation time */
+.generation-time {
+  margin-top: 10px;
+  font-style: italic;
+  color: #666;
+}
+
+/* Controls (Undo/Redo buttons) */
+.controls {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.history-btn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.history-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.history-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Social sharing buttons */
+.social-share {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.social-share-btn {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.social-share-btn.twitter { background-color: #1DA1F2; }
+.social-share-btn.facebook { background-color: #4267B2; }
+.social-share-btn.linkedin { background-color: #0077B5; }
+
+.social-share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode toggle */
+.top-bar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.dark-mode-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+/* Achievements */
+.achievements {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.achievement-badge {
+  font-size: 24px;
+  cursor: help;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .code-gen-container {
+    padding: 20px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .title {
+    font-size: 28px;
   }
+  
+  .social-share {
+    flex-direction: column;
+  }
+  
+  .social-share-btn {
+    width: 100%;
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

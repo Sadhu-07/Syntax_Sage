@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FaMoon, FaSun, FaUndo, FaRedo, FaTwitter, FaFacebook, FaLinkedin } from 'react-icons/fa';
+import { DiPython, DiJavascript1, DiJava, DiCss3 } from 'react-icons/di';
+import './App.css';
+
+const topLanguages = [
+  "Python", "JavaScript", "Java", "C++", "C#", "TypeScript", "PHP", "Ruby", "Swift", "Go",
+  "Rust", "Kotlin", "Scala", "R", "Dart", "Objective-C", "Haskell", "Lua", "Julia", "Groovy",
+  "Perl", "MATLAB", "Visual Basic", "Assembly", "Fortran", "Lisp", "Ada", "Cobol", "Prolog", "F#",
+  "Clojure", "Erlang", "Elixir", "OCaml", "Scheme", "Bash", "PowerShell", "SQL", "PL/SQL", "Delphi",
+  "Pascal", "VBScript", "D", "SAS", "Scratch", "ABAP", "ActionScript", "Alice", "APL", "AutoHotkey"
+];
 
 export default function CodeGenerator() {
   const [prompt, setPrompt] = useState('');
-  const [language, setLanguage] = useState('python');
+  const [language, setLanguage] = useState('Python');
   const [maxLength, setMaxLength] = useState(200);
   const [generatedCode, setGeneratedCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [generationTime, setGenerationTime] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [achievements, setAchievements] = useState([]);
+
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (hasVisited) {
+      // User has visited before, do not show onboarding
+    } else {
+      localStorage.setItem('hasVisited', 'true');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,11 +48,16 @@ export default function CodeGenerator() {
         max_length: maxLength,
       });
       
-      setGeneratedCode(response.data.generated_code);
+      const newCode = response.data.generated_code;
+      setGeneratedCode(newCode);
+      setHistory([...history.slice(0, historyIndex + 1), newCode]);
+      setHistoryIndex(historyIndex + 1);
       
       if (response.data.generation_time) {
         setGenerationTime(response.data.generation_time);
       }
+
+      checkAchievements(newCode);
     } catch (err) {
       setError('An error occurred while generating code. Please try again.');
       console.error(err);
@@ -37,89 +66,151 @@ export default function CodeGenerator() {
     setIsLoading(false);
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => setPrompt(e.target.result);
+      reader.readAsText(files[0]);
+    }
+  };
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setGeneratedCode(history[historyIndex - 1]);
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setGeneratedCode(history[historyIndex + 1]);
+    }
+  };
+
+  const checkAchievements = (code) => {
+    const newAchievements = [];
+    if (code.length > 500 && !achievements.includes('Code Master')) {
+      newAchievements.push('Code Master');
+    }
+    if (code.includes('function') && !achievements.includes('Function Ninja')) {
+      newAchievements.push('Function Ninja');
+    }
+    setAchievements([...achievements, ...newAchievements]);
+  };
+
+  const shareOnTwitter = () => {
+    const text = encodeURIComponent(`Check out this amazing code I generated with Syntax Sage!\n\n${generatedCode.slice(0, 100)}...`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <div className="max-w-md mx-auto">
-            <div>
-              <h1 className="text-2xl font-semibold">SyntaxSage</h1>
-            </div>
-            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-              <div className="rounded-md shadow-sm -space-y-px">
-                <div>
-                  <label htmlFor="prompt" className="sr-only">Prompt</label>
-                  <textarea
-                    id="prompt"
-                    name="prompt"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Enter your prompt here"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="language" className="sr-only">Language</label>
-                  <select
-                    id="language"
-                    name="language"
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="java">Java</option>
-                    <option value="c++">C++</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="maxLength" className="sr-only">Max Length</label>
-                  <input
-                    id="maxLength"
-                    name="maxLength"
-                    type="number"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Max length"
-                    value={maxLength}
-                    onChange={(e) => setMaxLength(Number(e.target.value))}
-                  />
-                </div>
-              </div>
+    <div className={darkMode ? "app dark-mode" : "app"}>
+      <div className="top-bar">
+        <button onClick={toggleDarkMode} className="dark-mode-toggle" aria-label="Toggle dark mode">
+          {darkMode ? <FaSun /> : <FaMoon />}
+        </button>
+      </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Generating...' : 'Generate Code'}
-                </button>
-              </div>
-            </form>
-
-            {error && (
-              <div className="mt-4 text-red-600">{error}</div>
-            )}
-
-            {generatedCode && (
-              <div className="mt-8">
-                <h2 className="text-lg font-medium text-gray-900">Generated Code:</h2>
-                <pre className="mt-2 bg-gray-50 rounded-md p-4 overflow-x-auto text-sm text-gray-700">
-                  {generatedCode}
-                </pre>
-                {generationTime && (
-                  <div className="mt-2 text-sm text-gray-500">
-                    <strong>Generation Time:</strong> {generationTime} seconds
-                  </div>
-                )}
-              </div>
-            )}
+      <div className="code-gen-container">
+        <h1 className="title">Syntax Sage</h1>
+        
+        <form onSubmit={handleSubmit} className="code-gen-form">
+          <div className="drag-drop-area" onDragOver={handleDragOver} onDrop={handleDrop}>
+            <textarea
+              id="prompt"
+              name="prompt"
+              required
+              className="input large-input"
+              placeholder="Enter your prompt here or drag and drop a file"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
           </div>
-        </div>
+          <div>
+            <select
+              id="language"
+              name="language"
+              className="input"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              {topLanguages.map((lang) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <input
+              id="maxLength"
+              name="maxLength"
+              type="number"
+              required
+              className="input"
+              placeholder="Max length"
+              value={maxLength}
+              onChange={(e) => setMaxLength(Number(e.target.value))}
+            />
+          </div>
+          <button type="submit" className="submit-btn" disabled={isLoading}>
+            {isLoading ? 'Generating...' : 'Generate Code'}
+          </button>
+        </form>
+
+        {error && <div className="error-message">{error}</div>}
+
+        {generatedCode && (
+          <div className="output-container">
+            <h2>Generated Code:</h2>
+            <pre className="output">{generatedCode}</pre>
+            {generationTime && (
+              <div className="generation-time">
+                <strong>Generation Time:</strong> {generationTime} seconds
+              </div>
+            )}
+            <div className="controls">
+              <button onClick={undo} disabled={historyIndex <= 0} className="history-btn">
+                <FaUndo /> Undo
+              </button>
+              <button onClick={redo} disabled={historyIndex >= history.length - 1} className="history-btn">
+                <FaRedo /> Redo
+              </button>
+            </div>
+            <div className="social-share">
+              <button onClick={shareOnTwitter} className="social-share-btn twitter">
+                <FaTwitter /> Share on Twitter
+              </button>
+              <button className="social-share-btn facebook">
+                <FaFacebook /> Share on Facebook
+              </button>
+              <button className="social-share-btn linkedin">
+                <FaLinkedin /> Share on LinkedIn
+              </button>
+            </div>
+          </div>
+        )}
+
+        {achievements.length > 0 && (
+          <div className="achievements">
+            {achievements.map((achievement, index) => (
+              <span key={index} className="achievement-badge" title={achievement}>
+                🏆
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
